@@ -30,6 +30,13 @@
 #define UICR_REGOUT0_VALUE UICR_REGOUT0_VOUT_3V3
 
 /*------------------------------------------------------------------*/
+/* LED (unused)
+ *------------------------------------------------------------------*/
+#define LEDS_NUMBER       1
+#define LED_PRIMARY_PIN   _PINNUM(0, 15) // Blue
+#define LED_STATE_ON      1
+
+/*------------------------------------------------------------------*/
 /* BUTTON
  *------------------------------------------------------------------*/
 #define BUTTONS_NUMBER    2  // none connected at all
@@ -51,7 +58,7 @@
 #define USB_DESC_CDC_ONLY_PID  0x0C00
 
 #define UF2_PRODUCT_NAME  "Keychron Q11 Pro Bootloader"
-#define UF2_VOLUME_LABEL  "Q11-PRO-BOOT"
+#define UF2_VOLUME_LABEL  "Q11PRO-BOOT"
 #define UF2_BOARD_ID      "nRF52840-q11-pro"
 #define UF2_INDEX_URL     "https://keychron.com/"
 
