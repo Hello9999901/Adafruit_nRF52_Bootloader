@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2018 Ha Thach for Adafruit Industries
+ * Copyright (c) 2020 Yihui Xiong for Makerdiary
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,42 +22,46 @@
  * THE SOFTWARE.
  */
 
-#ifndef PCA10056_H
-#define PCA10056_H
+#ifndef _T1000_E_H
+#define _T1000_E_H
+
+#define _PINNUM(port, pin)    ((port)*32 + (pin))
 
 /*------------------------------------------------------------------*/
 /* LED
  *------------------------------------------------------------------*/
-#define LEDS_NUMBER         2
-#define LED_PRIMARY_PIN     13
-#define LED_SECONDARY_PIN   14
-#define LED_STATE_ON        0
+#define LEDS_NUMBER           1
+#define LED_PRIMARY_PIN       _PINNUM(0, 24)  // Green
+#define LED_STATE_ON          0
 
 /*------------------------------------------------------------------*/
 /* BUTTON
  *------------------------------------------------------------------*/
-#define BUTTONS_NUMBER      2
-#define BUTTON_1            11
-#define BUTTON_2            12
-#define BUTTON_PULL         NRF_GPIO_PIN_PULLUP
+#define BUTTONS_NUMBER        2
+#define BUTTON_1              _PINNUM(0, 6)  // Primary Button
+#define BUTTON_2              _PINNUM(0, 18) // unusable: RESET
+#define BUTTON_PULL           NRF_GPIO_PIN_PULLUP
 
 //--------------------------------------------------------------------+
 // BLE OTA
 //--------------------------------------------------------------------+
-#define BLEDIS_MANUFACTURER    "Nordic"
-#define BLEDIS_MODEL           "PCA10056"
+#define BLEDIS_MANUFACTURER   "Seeed Studio"
+#define BLEDIS_MODEL          "T1000-E"
 
 //--------------------------------------------------------------------+
 // USB
 //--------------------------------------------------------------------+
+#define USB_DESC_VID            0x2886
+#define USB_DESC_UF2_PID        0x0057
+#define USB_DESC_CDC_ONLY_PID   0x0057
 
-// Shared VID/PID with Feather nRF52840, will be disabled for building in the future
-#define USB_DESC_VID           0x239A
-#define USB_DESC_UF2_PID       0x00DA
-#define USB_DESC_CDC_ONLY_PID  0x00DA
+//--------------------------------------------------------------------+
+// UF2
+//--------------------------------------------------------------------+
+#define UF2_PRODUCT_NAME        "Seeed T1000-E for Meshtastic"
+#define UF2_VOLUME_LABEL        "T1000-E"
+#define UF2_BOARD_ID            "nRF52840-T1000-E-v1"
+#define UF2_INDEX_URL           "https://www.seeedstudio.com/SenseCAP-Card-Tracker-T1000-E-for-Meshtastic-p-5913.html"
 
-#define UF2_PRODUCT_NAME    "Nordic nRF52840 DK"
-#define UF2_BOARD_ID        "nRF52840-pca10056-v1"
-#define UF2_INDEX_URL       "https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK"
 
-#endif // PCA10056_H
+#endif /* _T1000_E_H */

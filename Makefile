@@ -10,6 +10,9 @@
 # local customization
 -include Makefile.user
 
+# Board specific
+-include src/boards/$(BOARD)/board.mk
+
 SDK_PATH     = lib/sdk/components
 SDK11_PATH   = lib/sdk11/components
 TUSB_PATH    = lib/tinyusb/src
@@ -18,7 +21,11 @@ SD_PATH      = lib/softdevice/$(SD_FILENAME)
 
 # SD_VERSION can be overwritten by board.mk
 ifndef SD_VERSION
-SD_VERSION   = 6.1.1
+	ifeq ($(MCU_SUB_VARIANT),nrf52833)
+	SD_VERSION = 7.3.0
+	else
+	SD_VERSION = 6.1.1
+	endif
 endif
 
 SD_FILENAME  = $(SD_NAME)_nrf52_$(SD_VERSION)
@@ -41,6 +48,8 @@ OUT_NAME = $(BOARD)_bootloader-$(GIT_VERSION)
 
 # merged file = compiled + sd
 MERGED_FILE = $(OUT_NAME)_$(SD_NAME)_$(SD_VERSION)
+
+UF2_FAMILY_ID_BOOTLOADER = 0xd663823c
 
 #------------------------------------------------------------------------------
 # Tool Configure
@@ -89,24 +98,9 @@ endif
 BMP_PORT ?= $(shell ls -1 /dev/cu.usbmodem????????1 | head -1)
 GDB_BMP = $(GDB) -ex 'target extended-remote $(BMP_PORT)' -ex 'monitor swdp_scan' -ex 'attach 1'
 
-#---------------------------------
-# Select the board to build
-#---------------------------------
-# Note: whitespace is not allowed in the filenames... it WILL break this part of the script
-BOARD_LIST = $(sort $(filter-out boards.h boards.c,$(notdir $(wildcard src/boards/*))))
-
-ifeq ($(filter $(BOARD),$(BOARD_LIST)),)
-  $(info You must provide a BOARD parameter with 'BOARD='. Supported boards are:)
-  $(foreach b,$(BOARD_LIST),$(info - $(b)))
-  $(error Invalid BOARD specified)
-endif
-
 # Build directory
 BUILD = _build/build-$(BOARD)
 BIN = _bin/$(BOARD)
-
-# Board specific
--include src/boards/$(BOARD)/board.mk
 
 # MCU_SUB_VARIANT can be nrf52 (nrf52832), nrf52833, nrf52840
 ifeq ($(MCU_SUB_VARIANT),nrf52)
@@ -443,7 +437,7 @@ $(BUILD)/$(OUT_NAME)_nosd.hex: $(BUILD)/$(OUT_NAME).hex
 # Bootolader self-update uf2
 $(BUILD)/update-$(OUT_NAME)_nosd.uf2: $(BUILD)/$(OUT_NAME)_nosd.hex
 	@echo Create $(notdir $@)
-	@python3 lib/uf2/utils/uf2conv.py -f 0xd663823c -c -o $@ $^
+	@python3 lib/uf2/utils/uf2conv.py -f $(UF2_FAMILY_ID_BOOTLOADER) -c -o $@ $^
 
 # merge bootloader and sd hex together
 $(BUILD)/$(MERGED_FILE).hex: $(BUILD)/$(OUT_NAME).hex
@@ -495,6 +489,11 @@ mbr: flash-mbr
 flash-mbr:
 	@echo Flashing: $(MBR_HEX)
 	$(call FLASH_NOUICR_CMD,$(MBR_HEX))
+
+# flash using uf2
+flash-uf2: $(BUILD)/update-$(OUT_NAME)_nosd.uf2
+	@echo Flashing: $(notdir $<)
+	python lib/uf2/utils/uf2conv.py -f $(UF2_FAMILY_ID_BOOTLOADER) --deploy $<
 
 # dfu with adafruit-nrfutil using CDC interface
 dfu-flash: flash-dfu
